@@ -1,16 +1,26 @@
-# chatapp
+# ChatApp – QR paired chat (Flutter)
 
-A new Flutter project.
+This app lets two Android devices start a temporary chat by pairing via QR code.
+One device hosts a WebSocket server on the local network and shows a QR that encodes the ws:// URL. The other device scans and connects. Messages are stored locally in SQLite.
 
-## Getting Started
+Features
+- QR generate/scan for pairing
+- Real-time messages over WebSocket (LAN)
+- Local chat history (SQLite)
+- Simple WhatsApp-like UI and toasts
 
-This project is a starting point for a Flutter application.
+Run
+1) Ensure two devices are on the same Wi‑Fi network.
+2) In VS Code, press F5 (config: “Flutter: Run main.dart”).
+3) In the CHATS tab, tap “Pair” (QR icon).
+	- Device A: Tap “Host & show QR” and keep the QR visible.
+	- Device B: Point the camera to the QR and connect.
+4) Start chatting. History persists locally.
 
-A few resources to get you started if this is your first Flutter project:
+Build APK
+- Debug: flutter build apk
+- Release: flutter build apk --release
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Notes
+- Camera permission is required for scanning.
+- Cleartext traffic is enabled for LAN ws:// URLs.
