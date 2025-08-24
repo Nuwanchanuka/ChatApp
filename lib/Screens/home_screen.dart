@@ -88,7 +88,7 @@ class _HomescreenState extends State<Homescreen> {
                   onTap: () async {
                     await Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                      MaterialPageRoute(builder: (_) => const ProfileScreen(showBackButton: true)),
                     );
                     if (!mounted) return;
                     // Refresh AppBar to reflect any username change

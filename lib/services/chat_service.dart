@@ -8,7 +8,6 @@ import '../models/chat_model.dart';
 import '../models/message_model.dart';
 import 'database_service.dart';
 import 'settings.dart';
-import '../utils/logger.dart';
 
 class ChatService {
   static final ChatService _i = ChatService._internal();
@@ -21,19 +20,64 @@ class ChatService {
   final _uuid = const Uuid();
   final _incoming = StreamController<void>.broadcast();
   final _connection = StreamController<String>.broadcast();
+  final _connectionRequest = StreamController<Map<String, dynamic>>.broadcast();
   
   // New database service integration
   final DatabaseService _db = DatabaseService();
 
   Stream<void> get incomingStream => _incoming.stream;
   Stream<String> get connectionStream => _connection.stream;
+  Stream<Map<String, dynamic>> get connectionRequestStream => _connectionRequest.stream;
 
   bool get isConnected => _socket != null;
   
   String get currentUserId => SettingsService().username ?? 'anonymous';
 
   Future<String?> _localIpv4() async {
-    final nics = await NetworkInterface.list(type: InternetAddressType.IPv4, includeLoopback: false);
+    // Try to pick a LAN-reachable IP. Prefer Wi‑Fi/hotspot interfaces and avoid
+    // emulator-only subnets like 10.0.2.x which are not reachable from other devices.
+    final nics = await NetworkInterface.list(
+      type: InternetAddressType.IPv4,
+      includeLoopback: false,
+    );
+
+    String? fallback;
+
+    bool _isEmulatorSubnet(String ip) => ip.startsWith('10.0.2.');
+    bool _isPrivate172(String ip) {
+      // Match 172.16.0.0 – 172.31.255.255
+      if (!ip.startsWith('172.')) return false;
+      final parts = ip.split('.');
+      if (parts.length < 2) return false;
+      final second = int.tryParse(parts[1]) ?? -1;
+      return second >= 16 && second <= 31;
+    }
+
+    for (final nic in nics) {
+      final name = nic.name.toLowerCase();
+      final isWifi = name.contains('wlan') || name.contains('wifi');
+      final isHotspot = name.contains('ap') || name.contains('softap');
+
+      for (final addr in nic.addresses) {
+        final ip = addr.address;
+        if (addr.isLoopback) continue;
+        final isEmu = _isEmulatorSubnet(ip);
+        final isPrivate = ip.startsWith('192.168.') || ip.startsWith('10.') || _isPrivate172(ip);
+
+        // Most desirable: Wi‑Fi/Hotspot private address that is not emulator subnet
+        if ((isWifi || isHotspot) && isPrivate && !isEmu) {
+          return ip;
+        }
+
+        // Accept any non-emulator private address as a fallback
+        if (fallback == null && isPrivate && !isEmu) {
+          fallback = ip;
+        }
+      }
+    }
+
+    // As a last resort return whatever non-loopback we saw first
+    if (fallback != null) return fallback;
     for (final nic in nics) {
       for (final addr in nic.addresses) {
         if (!addr.isLoopback) return addr.address;
@@ -49,28 +93,34 @@ class ChatService {
   }
 
   Future<String> startHost() async {
-    try {
-      AppLogger.connection('Starting host server...');
-      // Bind on all interfaces so peers on same Wi-Fi can connect
-      _server = await HttpServer.bind(InternetAddress.anyIPv4, 0);
-      AppLogger.connection('Server bound to port ${_server!.port}');
-      
-    _server!.listen((HttpRequest req) async {
-        if (req.uri.path == '/ws' && WebSocketTransformer.isUpgradeRequest(req)) {
-      final remoteIp = req.connectionInfo?.remoteAddress.address;
-      AppLogger.connection('WebSocket upgrade request from $remoteIp');
-      
-      final ws = await WebSocketTransformer.upgrade(req);
-          _socket = ws;
-    _connection.add('connected');
-      peerId = remoteIp ?? peerId ?? 'peer';
-      AppLogger.connection('Connected to peer: $peerId');
-      
-          ws.listen((data) async {
-            try {
-              final m = jsonDecode(data as String) as Map<String, dynamic>;
-              AppLogger.connection('Received message from $peerId');
-              
+    // Bind on all interfaces so peers on same Wi-Fi can connect
+    _server = await HttpServer.bind(InternetAddress.anyIPv4, 0);
+  _server!.listen((HttpRequest req) async {
+      if (req.uri.path == '/ws' && WebSocketTransformer.isUpgradeRequest(req)) {
+    final remoteIp = req.connectionInfo?.remoteAddress.address;
+    final ws = await WebSocketTransformer.upgrade(req);
+        _socket = ws;
+  _connection.add('connected');
+    peerId = remoteIp ?? peerId ?? 'peer';
+        ws.listen((data) async {
+          try {
+            final m = jsonDecode(data as String) as Map<String, dynamic>;
+            print('Host received message: $m'); // Debug log
+            
+            // Handle different message types
+            if (m['type'] == 'connection_request') {
+              print('Host received connection request from: ${m['requesterName']}'); // Debug log
+              // Host receives connection request
+              _connectionRequest.add({
+                'requesterName': m['requesterName'],
+                'requesterId': m['requesterId'],
+                'socket': ws,
+              });
+              return;
+            }
+            
+            // Regular chat message
+            if (m['type'] == 'message' || m['id'] != null) {
               await DBService().insertMessage(
                 peer: peerId!,
                 id: m['id'] as String,
@@ -88,55 +138,79 @@ class ChatService {
                 content: m['text'] as String,
                 timestamp: DateTime.fromMillisecondsSinceEpoch(m['ts'] as int),
               );
-              
-              _incoming.add(null);
-            } catch (e) {
-              AppLogger.error('Error processing received message', error: e);
             }
-          }, onDone: () {
-            _socket = null;
-            _connection.add('disconnected');
-            AppLogger.connection('WebSocket connection closed');
-          }, onError: (e) {
-            _socket = null;
-            _connection.add('error:$e');
-            AppLogger.error('WebSocket error', error: e);
-          });
-        } else {
-          req.response
-            ..statusCode = HttpStatus.notFound
-            ..close();
-        }
-      });
-      
-      final url = await serverWsUrl;
-      if (url == null) {
-        AppLogger.error('Could not determine local IP');
-        throw Exception('Could not determine local IP');
+            
+            _incoming.add(null);
+          } catch (e) {
+            print('Host error processing message: $e'); // Debug log
+          }
+        }, onDone: () {
+          _socket = null;
+          _connection.add('disconnected');
+        }, onError: (e) {
+          _socket = null;
+          _connection.add('error:$e');
+        });
+        
+        // Create a chat for this connection
+        await _createChatForConnection();
+      } else {
+        req.response
+          ..statusCode = HttpStatus.notFound
+          ..close();
       }
-      
-      AppLogger.connection('Server started at: $url');
-      return url;
-    } catch (e) {
-      AppLogger.error('Failed to start host server', error: e);
-      rethrow;
+    });
+    final url = await serverWsUrl;
+    if (url == null) {
+      throw Exception('Could not determine local IP');
     }
+    return url;
   }
 
   Future<void> connectTo(String wsUrl, {String? peer}) async {
-    try {
-      AppLogger.connection('Attempting to connect to: $wsUrl');
-      peerId = peer ?? Uri.parse(wsUrl).host;
-      
+    peerId = peer ?? Uri.parse(wsUrl).host;
+    print('Connecting to: $wsUrl with peerId: $peerId'); // Debug log
     _socket = await WebSocket.connect(wsUrl);
     _connection.add('connected');
-    AppLogger.connection('Successfully connected to peer: $peerId');
+    
+    // Send connection request instead of immediately creating chat
+    final userSettings = SettingsService();
+    await userSettings.load();
+    final requesterName = userSettings.username?.isNotEmpty == true 
+        ? userSettings.username! 
+        : 'User ${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}';
+    
+    final request = {
+      'type': 'connection_request',
+      'requesterName': requesterName,
+      'requesterId': peerId,
+    };
+    print('Sending connection request: $request'); // Debug log
+    _socket!.add(jsonEncode(request));
     
     _socket!.listen((data) async {
-        try {
-          final m = jsonDecode(data as String) as Map<String, dynamic>;
-          AppLogger.connection('Received message from $peerId');
-          
+      try {
+        final m = jsonDecode(data as String) as Map<String, dynamic>;
+        print('Received message: $m'); // Debug log
+        
+        // Handle different message types
+        if (m['type'] == 'connection_accepted') {
+          print('Connection accepted, creating chat...'); // Debug log
+          // Client receives acceptance - create chat
+          await _createChatForConnection();
+          _connection.add('chat_created');
+          return;
+        }
+        
+        if (m['type'] == 'connection_rejected') {
+          print('Connection rejected'); // Debug log
+          // Client receives rejection
+          _connection.add('connection_rejected');
+          return;
+        }
+        
+        // Regular chat message
+        if (m['type'] == 'message' || m['id'] != null) {
           await DBService().insertMessage(
             peer: peerId!,
             id: m['id'] as String,
@@ -155,24 +229,18 @@ class ChatService {
             timestamp: DateTime.fromMillisecondsSinceEpoch(m['ts'] as int),
           );
           
-      _incoming.add(null);
-        } catch (e) {
-          AppLogger.error('Error processing received message', error: e);
+          _incoming.add(null);
         }
-      }, onDone: () {
-        _socket = null;
-        _connection.add('disconnected');
-        AppLogger.connection('Connection to $peerId closed');
-      }, onError: (e) {
-        _socket = null;
-        _connection.add('error:$e');
-        AppLogger.error('Connection error with $peerId', error: e);
-      });
-    } catch (e) {
-      AppLogger.error('Failed to connect to $wsUrl', error: e);
+      } catch (e) {
+        print('Error processing message: $e'); // Debug log
+      }
+    }, onDone: () {
+      _socket = null;
+      _connection.add('disconnected');
+    }, onError: (e) {
+      _socket = null;
       _connection.add('error:$e');
-      rethrow;
-    }
+    });
   }
 
   Future<void> send(String myName, String text) async {
@@ -387,5 +455,61 @@ class ChatService {
 
   Future<void> clearAllData() async {
     await _db.clearUserData(currentUserId);
+  }
+
+  // Create chat when connection is established
+  Future<Chat> _createChatForConnection() async {
+    if (peerId == null) {
+      throw Exception('No peer ID available');
+    }
+    
+    // Generate a friendly name for the peer
+    final peerName = 'Contact ${peerId!.split('.').last}';
+    
+    // Create or get existing chat
+    final chat = await createOrGetChat(peerName, contactId: peerId);
+    
+    // Send an initial connection message
+    await receiveMessage(
+      chatId: chat.chatId,
+      senderId: peerId!,
+      senderName: peerName,
+      content: '👋 Connected via QR code!',
+    );
+    
+    return chat;
+  }
+
+  // Get the current chat for connected peer
+  Future<Chat?> getCurrentPeerChat() async {
+    if (peerId == null) return null;
+    return await getChat(peerId!);
+  }
+
+  // Accept connection request
+  Future<void> acceptConnectionRequest(WebSocket socket, String requesterId, String requesterName) async {
+    print('Accepting connection request from: $requesterName ($requesterId)'); // Debug log
+    // Create chat for host
+    peerId = requesterId;
+    _socket = socket;
+    await _createChatForConnection();
+    
+    // Send acceptance to client
+    final response = {
+      'type': 'connection_accepted',
+      'hostName': (await SettingsService()..load()).username ?? 'Host',
+    };
+    print('Sending acceptance response: $response'); // Debug log
+    socket.add(jsonEncode(response));
+    
+    _connection.add('chat_created');
+  }
+
+  // Reject connection request
+  Future<void> rejectConnectionRequest(WebSocket socket) async {
+    print('Rejecting connection request'); // Debug log
+    socket.add(jsonEncode({
+      'type': 'connection_rejected',
+    }));
   }
 }
