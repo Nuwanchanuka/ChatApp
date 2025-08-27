@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/settings.dart';
 import 'profile_setup_screen.dart';
-import 'edit_profile_screen.dart';
+import 'edit_profile_sheet.dart';
 
 class ProfileScreen extends StatefulWidget {
   final bool showBackButton;
@@ -74,13 +74,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         child: IconButton(
                           onPressed: () async {
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const EditProfileScreen(),
-                              ),
+                            final result = await showModalBottomSheet<bool>(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (_) => const EditProfileSheet(),
                             );
-                            if (mounted) setState(() {});
+                            if (mounted && (result ?? false)) {
+                              setState(() {}); // refresh after save
+                            }
                           },
                           icon: const Icon(
                             Icons.edit,

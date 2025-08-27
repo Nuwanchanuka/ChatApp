@@ -121,7 +121,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        foregroundColor: Colors.black87,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black87),
@@ -135,69 +135,88 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              TextFormField(
-                controller: _firstController,
-                style: const TextStyle(color: Colors.black87),
-                decoration: _dec('First name', prefixIcon: const Icon(Icons.person_outline, color: Colors.black54)),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _lastController,
-                style: const TextStyle(color: Colors.black87),
-                decoration: _dec('Last name'),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    flex: 4,
-                    child: InputDecorator(
-                      decoration: _dec('Country'),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          value: _countryLabel,
-                          dropdownColor: Colors.white,
-                          items: _countries
-                              .map((c) => DropdownMenuItem<String>(
-                                    value: c['label']!,
-                                    child: Text(c['label']!, style: const TextStyle(color: Colors.black87)),
-                                  ))
-                              .toList(),
-                          onChanged: (v) {
-                            if (v == null) return;
-                            setState(() {
-                              _countryLabel = v;
-                              _countryCode = _countries.firstWhere((e) => e['label'] == v)['code']!;
-                            });
-                          },
-                        ),
-                      ),
+              // Shadow box section containing the form fields
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 16,
+                      offset: const Offset(0, 8),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 6,
-                    child: TextFormField(
-                      controller: _phoneController,
-                      keyboardType: TextInputType.phone,
+                  ],
+                  border: Border.all(color: const Color(0xFFEAEAEA)),
+                ),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: _firstController,
                       style: const TextStyle(color: Colors.black87),
-                      decoration: _dec('Phone'),
-                      validator: (v) => (v == null || v.trim().length < 6) ? 'Invalid phone' : null,
+                      decoration: _dec('First name', prefixIcon: const Icon(Icons.person_outline, color: Colors.black54)),
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _lastController,
+                      style: const TextStyle(color: Colors.black87),
+                      decoration: _dec('Last name'),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 4,
+                          child: InputDecorator(
+                            decoration: _dec('Country'),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                value: _countryLabel,
+                                dropdownColor: Colors.white,
+                                items: _countries
+                                    .map((c) => DropdownMenuItem<String>(
+                                          value: c['label']!,
+                                          child: Text(c['label']!, style: const TextStyle(color: Colors.black87)),
+                                        ))
+                                    .toList(),
+                                onChanged: (v) {
+                                  if (v == null) return;
+                                  setState(() {
+                                    _countryLabel = v;
+                                    _countryCode = _countries.firstWhere((e) => e['label'] == v)['code']!;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          flex: 6,
+                          child: TextFormField(
+                            controller: _phoneController,
+                            keyboardType: TextInputType.phone,
+                            style: const TextStyle(color: Colors.black87),
+                            decoration: _dec('Phone'),
+                            validator: (v) => (v == null || v.trim().length < 6) ? 'Invalid phone' : null,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Sync contact to phone', style: TextStyle(color: Colors.black87)),
+                      value: _syncToPhone,
+                      activeColor: const Color(0xFF66BB6A),
+                      onChanged: (v) => setState(() => _syncToPhone = v),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 24),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('Sync contact to phone', style: TextStyle(color: Colors.black87)),
-                value: _syncToPhone,
-                activeColor: const Color(0xFF66BB6A),
-                onChanged: (v) => setState(() => _syncToPhone = v),
-              ),
-              // Email sync target removed per requirement (no email change in this screen)
-              const SizedBox(height: 32),
               SizedBox(
                 height: 52,
                 child: ElevatedButton(
