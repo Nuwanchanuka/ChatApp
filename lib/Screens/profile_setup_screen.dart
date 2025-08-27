@@ -89,7 +89,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
         ),
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 100),
             child: Form(
               key: _formKey,
               child: Column(
@@ -240,7 +240,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                       child: _saving
                           ? const SizedBox(
                               width: 24,
-                              height: 24,
+                              // height: 24,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
                                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
