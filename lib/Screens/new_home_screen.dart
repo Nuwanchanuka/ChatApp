@@ -74,7 +74,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
           colors: [
             Color(0xFF4A90E2),
             Color(0xFF5BA0F2),
-            Color(0xFF6CB0FF),
+             Color.fromARGB(255, 227, 233, 239),
           ],
         ),
       ),
@@ -334,9 +334,9 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Color(0xFF4A90E2),
-            Color(0xFF5BA0F2),
             Color(0xFF6CB0FF),
+             Color(0xFF6CB0FF),
+             Color.fromARGB(255, 227, 233, 239),
           ],
         ),
       ),
@@ -490,9 +490,9 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Color(0xFF4A90E2),
-            Color(0xFF5BA0F2),
-            Color(0xFF6CB0FF),
+            Color.fromARGB(255, 227, 233, 239),
+             Color.fromARGB(255, 227, 233, 239),
+           Color.fromARGB(255, 227, 233, 239),
           ],
         ),
       ),
