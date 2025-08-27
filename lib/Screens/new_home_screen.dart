@@ -5,7 +5,6 @@ import '../models/chat_model.dart';
 import 'pair_screen.dart';
 import 'profile_screen.dart';
 import 'new_chat_page.dart';
-import 'chat_demo_page.dart';
 
 class NewHomeScreen extends StatefulWidget {
   const NewHomeScreen({super.key});
@@ -24,12 +23,22 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
   void initState() {
     super.initState();
     _loadChats();
-    _listenToIncomingMessages();
+  _listenToIncomingMessages();
+  _listenToConnectionEvents();
   }
 
   void _listenToIncomingMessages() {
     _chatService.incomingStream.listen((_) {
       _loadChats();
+    });
+  }
+
+  void _listenToConnectionEvents() {
+    _chatService.connectionStream.listen((event) {
+      // When a new chat is created via QR flow, refresh list to show the peer's name
+      if (event == 'chat_created' || event == 'connected') {
+        _loadChats();
+      }
     });
   }
 

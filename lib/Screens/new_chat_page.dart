@@ -26,16 +26,32 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
   bool _loading = true;
   bool _sending = false;
   bool _isTyping = false;
+  bool _chatReady = false;
   late Chat _currentChat;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  
+  Future<void> _handleBack() async {
+    // Best-effort delete; ignore errors so navigation isn't blocked
+    try {
+      await _chatService.deleteChat(_currentChat.chatId);
+    } catch (_) {}
+  }
 
   @override
   void initState() {
     super.initState();
-    _initializeChat();
     _setupAnimations();
-    _loadMessages();
+    _initAndLoad();
+  }
+
+  Future<void> _initAndLoad() async {
+    await _initializeChat();
+    if (!mounted) return;
+    setState(() {
+      _chatReady = true;
+    });
+    await _loadMessages();
     _listenToIncomingMessages();
     _listenToTyping();
   }
@@ -71,6 +87,13 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
         contactId: 'default_${DateTime.now().millisecondsSinceEpoch}',
       );
     }
+  }
+
+  String _displayName() {
+    final fromParam = (widget.contactName ?? '').trim();
+    if (fromParam.isNotEmpty) return fromParam;
+    final name = _chatReady ? _currentChat.name.trim() : '';
+    return name.isNotEmpty ? name : 'Chat';
   }
 
   @override
@@ -287,7 +310,13 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+  final titleName = _displayName();
+    return WillPopScope(
+      onWillPop: () async {
+        await _handleBack();
+        return true; // allow pop
+      },
+      child: Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         elevation: 0,
@@ -303,14 +332,17 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () async {
+            await _handleBack();
+            if (mounted) Navigator.pop(context);
+          },
         ),
         title: Row(
           children: [
             CircleAvatar(
               backgroundColor: Colors.white.withOpacity(0.2),
               child: Text(
-                _currentChat.name.isNotEmpty ? _currentChat.name[0].toUpperCase() : 'C',
+        titleName.isNotEmpty ? titleName[0].toUpperCase() : 'C',
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -324,7 +356,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    _currentChat.name,
+          titleName,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -343,26 +375,9 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.videocam, color: Colors.white),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Video call feature coming soon!')),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.call, color: Colors.white),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Voice call feature coming soon!')),
-              );
-            },
-          ),
-        ],
+  actions: const [],
       ),
-      body: FadeTransition(
+  body: FadeTransition(
         opacity: _fadeAnimation,
         child: Column(
           children: [
@@ -388,7 +403,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildEmptyState() {
@@ -423,7 +438,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
           ),
           const SizedBox(height: 8),
           Text(
-            'Send a message to begin chatting with ${_currentChat.name}',
+            'Send a message to begin chatting with ${_displayName()}',
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[600],
@@ -436,12 +451,17 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
   }
 
   Widget _buildMessageInput() {
-    return Container(
+    return SafeArea(
+      top: false,
+      child: Container(
       padding: EdgeInsets.only(
         left: 16,
         right: 16,
         top: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+  // Keep a fixed bottom padding; avoid adding viewInsets here because
+  // the Scaffold already resizes for the keyboard. Adding it causes
+  // the input to jump up toward the middle when typing.
+  bottom: 16,
       ),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -504,6 +524,6 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
           ),
         ],
       ),
-    );
+  ));
   }
 }

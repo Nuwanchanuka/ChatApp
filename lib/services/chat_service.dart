@@ -151,9 +151,6 @@ class ChatService {
           _socket = null;
           _connection.add('error:$e');
         });
-        
-        // Create a chat for this connection
-        await _createChatForConnection();
       } else {
         req.response
           ..statusCode = HttpStatus.notFound
@@ -197,7 +194,8 @@ class ChatService {
         if (m['type'] == 'connection_accepted') {
           print('Connection accepted, creating chat...'); // Debug log
           // Client receives acceptance - create chat
-          await _createChatForConnection();
+          final hostName = (m['hostName'] as String?)?.trim();
+          await _createChatForConnection(displayName: (hostName != null && hostName.isNotEmpty) ? hostName : null);
           _connection.add('chat_created');
           return;
         }
@@ -458,16 +456,24 @@ class ChatService {
   }
 
   // Create chat when connection is established
-  Future<Chat> _createChatForConnection() async {
+  Future<Chat> _createChatForConnection({String? displayName}) async {
     if (peerId == null) {
       throw Exception('No peer ID available');
     }
     
     // Generate a friendly name for the peer
-    final peerName = 'Contact ${peerId!.split('.').last}';
+    final fallback = 'Contact ${peerId!.split('.').last}';
+    final peerName = (displayName != null && displayName.trim().isNotEmpty)
+        ? displayName.trim()
+        : fallback;
     
-    // Create or get existing chat
-    final chat = await createOrGetChat(peerName, contactId: peerId);
+    // Create or get existing chat, then ensure name is correct
+    var chat = await createOrGetChat(peerName, contactId: peerId);
+    if (chat.name != peerName && peerName.isNotEmpty) {
+      final updated = chat.copyWith(name: peerName);
+      await _db.updateChat(updated);
+      chat = updated;
+    }
     
     // Send an initial connection message
     await receiveMessage(
@@ -492,7 +498,7 @@ class ChatService {
     // Create chat for host
     peerId = requesterId;
     _socket = socket;
-    await _createChatForConnection();
+  await _createChatForConnection(displayName: requesterName);
     
     // Send acceptance to client
     final response = {
