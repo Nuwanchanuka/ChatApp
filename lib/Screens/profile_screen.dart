@@ -177,6 +177,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         style: TextStyle(
                           color: Colors.white.withValues(alpha:0.8),
                           fontSize: 18,
+                        ),
+                      ),
                       const SizedBox(height: 24),
                       // Info Card (Name + Phone) with shadow box
                       Container(

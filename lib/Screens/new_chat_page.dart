@@ -393,10 +393,8 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
-
-  final titleName = _displayName();
     return WillPopScope(
-  onWillPop: _confirmExitAndMaybeDelete,
+      onWillPop: _confirmExitAndMaybeDelete,
       child: Scaffold(
 
       backgroundColor: Colors.grey[50],
@@ -504,7 +502,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
           ],
         ),
       ),
-    );
+  ));
   }
 
   Widget _buildEmptyState() {
