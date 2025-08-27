@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/chat_model.dart';
 import '../models/message_model.dart';
 import '../services/chat_service.dart';
+import '../services/settings.dart';
 
 class NewChatPage extends StatefulWidget {
   final Chat? chat;
@@ -29,6 +31,110 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
   late Chat _currentChat;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+
+  
+  bool get _isEphemeralPeerChat =>
+      _chatService.peerId != null && _currentChat.chatId == _chatService.peerId;
+
+  Future<bool> _confirmExitAndMaybeDelete() async {
+    // Only prompt for ephemeral QR/peer chats. Otherwise just leave.
+  if (!_isEphemeralPeerChat) return true;
+
+  // If this chat is already marked as extended, don't ask again
+  final settings = SettingsService();
+  final alreadyExtended = await settings.isChatExtended(_currentChat.chatId);
+  if (alreadyExtended) return true;
+
+  final choice = await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Connection notice'),
+        content: const Text(
+          'This connection will be temporary and will only be extended by the consent of both parties.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'temp'),
+            child: const Text('Keep temporary'),
+          ),
+      FilledButton(
+            onPressed: () => Navigator.pop(context, 'extend'),
+            child: const Text('Extend & save'),
+          ),
+        ],
+      ),
+    );
+
+    if (choice == 'temp') {
+      try {
+        await _chatService.deleteChat(_currentChat.chatId);
+      } catch (_) {}
+      return true; // pop
+    }
+
+    if (choice == 'extend') {
+      // Ask the other user for consent via WebSocket
+      try {
+        await _chatService.proposeExtendChat();
+
+        // Wait for their answer briefly while the dialog closes
+        final result = await _waitForConsentResponse(timeout: const Duration(seconds: 10));
+        if (result == 'accept') {
+          await settings.setChatExtended(_currentChat.chatId, true);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Both parties agreed. Chat saved.')),
+            );
+          }
+          return true;
+        } else if (result == 'reject') {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Peer rejected saving this chat.')),
+            );
+          }
+          return true; // Leave chat as temporary (not deleted automatically)
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('No response. You can try again later.')),
+            );
+          }
+          return true;
+        }
+      } catch (_) {
+        return true;
+      }
+    }
+
+    return false; // no selection
+  }
+
+  Future<String?> _waitForConsentResponse({required Duration timeout}) async {
+    try {
+      final completer = Completer<String?>();
+      late StreamSubscription sub;
+      sub = _chatService.consentStream.listen((event) {
+        if (event['chatId'] == _chatService.peerId) {
+          if (event['event'] == 'extend_accept') {
+            completer.complete('accept');
+            sub.cancel();
+          } else if (event['event'] == 'extend_reject') {
+            completer.complete('reject');
+            sub.cancel();
+          }
+        }
+      });
+      return await completer.future.timeout(timeout, onTimeout: () {
+        sub.cancel();
+        return null;
+      });
+    } catch (_) {
+      return null;
+    }
+  }
+
 
   @override
   void initState() {
@@ -287,7 +393,12 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+
+  final titleName = _displayName();
+    return WillPopScope(
+  onWillPop: _confirmExitAndMaybeDelete,
+      child: Scaffold(
+
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         elevation: 0,
@@ -303,7 +414,12 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+
+          onPressed: () async {
+            final ok = await _confirmExitAndMaybeDelete();
+            if (ok && mounted) Navigator.pop(context);
+          },
+
         ),
         title: Row(
           children: [

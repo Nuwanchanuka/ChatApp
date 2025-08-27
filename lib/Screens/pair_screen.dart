@@ -312,10 +312,13 @@ class _PairScreenState extends State<PairScreen> {
           ),
         ),
         child: SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                 // Simple status
                 if (wsUrl == null)
                   Column(
@@ -511,7 +514,8 @@ class _PairScreenState extends State<PairScreen> {
                       ),
                     ],
                   ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

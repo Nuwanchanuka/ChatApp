@@ -21,6 +21,7 @@ class ChatService {
   final _incoming = StreamController<void>.broadcast();
   final _connection = StreamController<String>.broadcast();
   final _connectionRequest = StreamController<Map<String, dynamic>>.broadcast();
+  final _consent = StreamController<Map<String, dynamic>>.broadcast();
   
   // New database service integration
   final DatabaseService _db = DatabaseService();
@@ -28,6 +29,7 @@ class ChatService {
   Stream<void> get incomingStream => _incoming.stream;
   Stream<String> get connectionStream => _connection.stream;
   Stream<Map<String, dynamic>> get connectionRequestStream => _connectionRequest.stream;
+  Stream<Map<String, dynamic>> get consentStream => _consent.stream;
 
   bool get isConnected => _socket != null;
   
@@ -119,6 +121,20 @@ class ChatService {
               return;
             }
             
+            // Consent flow messages
+            if (m['type'] == 'extend_proposal') {
+              _consent.add({'event': 'extend_proposal', 'from': m['from'], 'chatId': peerId});
+              return;
+            }
+            if (m['type'] == 'extend_accept') {
+              _consent.add({'event': 'extend_accept', 'chatId': peerId});
+              return;
+            }
+            if (m['type'] == 'extend_reject') {
+              _consent.add({'event': 'extend_reject', 'chatId': peerId});
+              return;
+            }
+
             // Regular chat message
             if (m['type'] == 'message' || m['id'] != null) {
               await DBService().insertMessage(
@@ -193,7 +209,7 @@ class ChatService {
         final m = jsonDecode(data as String) as Map<String, dynamic>;
         print('Received message: $m'); // Debug log
         
-        // Handle different message types
+  // Handle different message types
         if (m['type'] == 'connection_accepted') {
           print('Connection accepted, creating chat...'); // Debug log
           // Client receives acceptance - create chat
@@ -209,6 +225,20 @@ class ChatService {
           return;
         }
         
+        // Consent flow messages
+        if (m['type'] == 'extend_proposal') {
+          _consent.add({'event': 'extend_proposal', 'from': m['from'], 'chatId': peerId});
+          return;
+        }
+        if (m['type'] == 'extend_accept') {
+          _consent.add({'event': 'extend_accept', 'chatId': peerId});
+          return;
+        }
+        if (m['type'] == 'extend_reject') {
+          _consent.add({'event': 'extend_reject', 'chatId': peerId});
+          return;
+        }
+
         // Regular chat message
         if (m['type'] == 'message' || m['id'] != null) {
           await DBService().insertMessage(
@@ -241,6 +271,30 @@ class ChatService {
       _socket = null;
       _connection.add('error:$e');
     });
+  }
+
+  // Consent: propose extending/persisting this chat
+  Future<void> proposeExtendChat() async {
+    if (_socket == null) return;
+    final userSettings = SettingsService();
+    await userSettings.load();
+    final name = userSettings.username ?? 'User';
+    final msg = {
+      'type': 'extend_proposal',
+      'from': name,
+      'chatId': peerId,
+    };
+    _socket!.add(jsonEncode(msg));
+  }
+
+  // Consent: respond to proposal
+  Future<void> respondExtendProposal(bool accept) async {
+    if (_socket == null) return;
+    final msg = {
+      'type': accept ? 'extend_accept' : 'extend_reject',
+      'chatId': peerId,
+    };
+    _socket!.add(jsonEncode(msg));
   }
 
   Future<void> send(String myName, String text) async {

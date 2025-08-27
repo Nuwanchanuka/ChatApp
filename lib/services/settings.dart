@@ -8,6 +8,7 @@ class SettingsService {
   static const _kUsernameKey = 'username';
   static const _kPhoneKey = 'phone';
   static const _kBioKey = 'bio';
+  static const _kExtendedChatsKey = 'extended_chats';
 
   String? _username;
   String? _phone;
@@ -60,5 +61,28 @@ class SettingsService {
     await prefs.remove(_kUsernameKey);
     await prefs.remove(_kPhoneKey);
     await prefs.remove(_kBioKey);
+  }
+
+  // Extended/saved chat helpers
+  Future<Set<String>> getExtendedChats() async {
+    final prefs = await SharedPreferences.getInstance();
+    final list = prefs.getStringList(_kExtendedChatsKey) ?? const [];
+    return list.toSet();
+  }
+
+  Future<bool> isChatExtended(String chatId) async {
+    final set = await getExtendedChats();
+    return set.contains(chatId);
+  }
+
+  Future<void> setChatExtended(String chatId, bool extended) async {
+    final prefs = await SharedPreferences.getInstance();
+    final set = (prefs.getStringList(_kExtendedChatsKey) ?? const []).toSet();
+    if (extended) {
+      set.add(chatId);
+    } else {
+      set.remove(chatId);
+    }
+    await prefs.setStringList(_kExtendedChatsKey, set.toList());
   }
 }
