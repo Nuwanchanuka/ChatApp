@@ -66,7 +66,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                     const Spacer(),
-                    // Edit profile button removed as requested
+                      // Header edit icon to open Edit Profile screen
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          onPressed: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const EditProfileScreen(),
+                              ),
+                            );
+                            if (mounted) setState(() {});
+                          },
+                          icon: const Icon(
+                            Icons.edit,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -77,25 +98,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
                     children: [
-                      const SizedBox(height: 20),
-                      // Edit button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            side: BorderSide(color: Colors.white.withOpacity(0.7)),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                          onPressed: () async {
-                            final route = MaterialPageRoute(builder: (_) => const EditProfileScreen());
-                            await Navigator.of(context).push(route);
-                            if (mounted) setState(() {}); // refresh values after edit
-                          },
-                          child: const Text('Edit profile'),
-                        ),
-                      ),
                       const SizedBox(height: 20),
                       
                       // Profile Avatar
@@ -133,30 +135,85 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       
+                      const SizedBox(height: 24),
+                      // Info Card (Name + Phone) with shadow box
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.16),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.25),
+                              blurRadius: 20,
+                              spreadRadius: 1,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.18),
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.18),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.person_outline, color: Colors.white),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    name,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Divider(color: Colors.white.withOpacity(0.15), height: 1),
+                            const SizedBox(height: 12),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.18),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.phone_outlined, color: Colors.white),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    phone,
+                                    style: TextStyle(
+                                      color: Colors.white.withOpacity(0.9),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 32),
-                      
-                      // Name
-                      Text(
-                        name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 32,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      
-                      const SizedBox(height: 12),
-                      
-                      // Phone Number
-                      Text(
-                        phone,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
-                          fontSize: 18,
-                        ),
-                      ),
-                      
-                      const SizedBox(height: 40),
                       
                       // Bio Section
                       Container(

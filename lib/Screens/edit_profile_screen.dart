@@ -97,36 +97,37 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   InputDecoration _dec(String label, {Widget? prefixIcon}) => InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white70),
+        labelStyle: const TextStyle(color: Colors.black54),
         prefixIcon: prefixIcon,
         filled: true,
-        fillColor: const Color(0xFF1E1E1E),
+        fillColor: Colors.grey[100],
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF2D2D2D)),
+          borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF2D2D2D)),
+          borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF66BB6A), width: 2),
+          borderSide: const BorderSide(color: Color(0xFF4A90E2), width: 2),
         ),
       );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF121212),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color: Colors.black87),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text('Edit contact'),
+        title: const Text('Edit contact', style: TextStyle(color: Colors.black87)),
       ),
       body: SafeArea(
         child: Form(
@@ -136,14 +137,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             children: [
               TextFormField(
                 controller: _firstController,
-                style: const TextStyle(color: Colors.white),
-                decoration: _dec('First name', prefixIcon: const Icon(Icons.person_outline, color: Colors.white70)),
+                style: const TextStyle(color: Colors.black87),
+                decoration: _dec('First name', prefixIcon: const Icon(Icons.person_outline, color: Colors.black54)),
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _lastController,
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.black87),
                 decoration: _dec('Last name'),
               ),
               const SizedBox(height: 16),
@@ -156,11 +157,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
                           value: _countryLabel,
-                          dropdownColor: const Color(0xFF1E1E1E),
+                          dropdownColor: Colors.white,
                           items: _countries
                               .map((c) => DropdownMenuItem<String>(
                                     value: c['label']!,
-                                    child: Text(c['label']!, style: const TextStyle(color: Colors.white)),
+                                    child: Text(c['label']!, style: const TextStyle(color: Colors.black87)),
                                   ))
                               .toList(),
                           onChanged: (v) {
@@ -180,7 +181,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     child: TextFormField(
                       controller: _phoneController,
                       keyboardType: TextInputType.phone,
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.black87),
                       decoration: _dec('Phone'),
                       validator: (v) => (v == null || v.trim().length < 6) ? 'Invalid phone' : null,
                     ),
@@ -190,7 +191,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               const SizedBox(height: 24),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Sync contact to phone', style: TextStyle(color: Colors.white)),
+                title: const Text('Sync contact to phone', style: TextStyle(color: Colors.black87)),
                 value: _syncToPhone,
                 activeColor: const Color(0xFF66BB6A),
                 onChanged: (v) => setState(() => _syncToPhone = v),
