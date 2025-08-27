@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/chat_model.dart';
 import '../models/message_model.dart';
 import '../services/chat_service.dart';
+import '../services/settings.dart';
 
 class NewChatPage extends StatefulWidget {
   final Chat? chat;
@@ -31,11 +32,59 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   
-  Future<void> _handleBack() async {
-    // Best-effort delete; ignore errors so navigation isn't blocked
-    try {
-      await _chatService.deleteChat(_currentChat.chatId);
-    } catch (_) {}
+  bool get _isEphemeralPeerChat =>
+      _chatService.peerId != null && _currentChat.chatId == _chatService.peerId;
+
+  Future<bool> _confirmExitAndMaybeDelete() async {
+    // Only prompt for ephemeral QR/peer chats. Otherwise just leave.
+  if (!_isEphemeralPeerChat) return true;
+
+  // If this chat is already marked as extended, don't ask again
+  final settings = SettingsService();
+  final alreadyExtended = await settings.isChatExtended(_currentChat.chatId);
+  if (alreadyExtended) return true;
+
+    final choice = await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Connection notice'),
+        content: const Text(
+          'This connection will be temporary and will only be extended by the consent of both parties.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'temp'),
+            child: const Text('Keep temporary'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, 'extend'),
+            child: const Text('Extend & save'),
+          ),
+        ],
+      ),
+    );
+
+    if (choice == 'temp') {
+      try {
+        await _chatService.deleteChat(_currentChat.chatId);
+      } catch (_) {}
+      return true; // pop
+    }
+
+  if (choice == 'extend') {
+      // Keep chat; optionally notify peer
+      try {
+        await _chatService.sendMessage(
+          chatId: _currentChat.chatId,
+          content: '🔒 I’d like to keep this chat. Do you agree?',
+        );
+    await settings.setChatExtended(_currentChat.chatId, true);
+      } catch (_) {}
+      return true; // pop without deleting
+    }
+
+    return false; // no selection
   }
 
   @override
@@ -312,10 +361,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
   Widget build(BuildContext context) {
   final titleName = _displayName();
     return WillPopScope(
-      onWillPop: () async {
-        await _handleBack();
-        return true; // allow pop
-      },
+  onWillPop: _confirmExitAndMaybeDelete,
       child: Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -333,8 +379,8 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () async {
-            await _handleBack();
-            if (mounted) Navigator.pop(context);
+            final ok = await _confirmExitAndMaybeDelete();
+            if (ok && mounted) Navigator.pop(context);
           },
         ),
         title: Row(

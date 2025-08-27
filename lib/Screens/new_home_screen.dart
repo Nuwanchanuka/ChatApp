@@ -58,6 +58,45 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
     }
   }
 
+  Future<void> _showNewContactDialog() async {
+    final controller = TextEditingController();
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Save contact'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            hintText: 'Enter contact name',
+            border: OutlineInputBorder(),
+          ),
+          textCapitalization: TextCapitalization.words,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final name = controller.text.trim();
+              if (name.isEmpty) return;
+              Navigator.pop(context);
+              final chat = await _chatService.createOrGetChat(name);
+              if (!mounted) return;
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => NewChatPage(chat: chat)),
+              );
+              _loadChats();
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
   String _formatTime(DateTime? time) {
     if (time == null) return '';
     final now = DateTime.now();
@@ -344,8 +383,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
           end: Alignment.bottomCenter,
           colors: [
             Color(0xFF6CB0FF),
-             Color(0xFF6CB0FF),
-             Color.fromARGB(255, 227, 233, 239),
+            Color(0xFF6CB0FF),
+            Color.fromARGB(255, 227, 233, 239),
           ],
         ),
       ),
@@ -355,8 +394,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
-                children: [
-                  const Text(
+                children: const [
+                  Text(
                     'Connect',
                     style: TextStyle(
                       color: Colors.white,
@@ -368,74 +407,77 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
               ),
             ),
             Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(24),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: const Icon(
+                        Icons.qr_code,
+                        color: Colors.white,
+                        size: 60,
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.qr_code,
-                      color: Colors.white,
-                      size: 60,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  const Text(
-                    'Connect with Friends',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 32),
-                    child: Text(
-                      'Scan someone\'s QR code or show yours to start chatting',
+                    const SizedBox(height: 32),
+                    const Text(
+                      'Connect with Friends',
                       style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16,
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
                       ),
-                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  const SizedBox(height: 40),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildActionButton(
-                        icon: Icons.qr_code_scanner,
-                        label: 'Scan QR',
-                        onTap: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const PairScreen()),
-                          );
-                          _loadChats();
-                        },
+                    const SizedBox(height: 16),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 32),
+                      child: Text(
+                        'Scan someone\'s QR code or show yours to start chatting',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 16,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      _buildActionButton(
-                        icon: Icons.qr_code,
-                        label: 'Show QR',
-                        onTap: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const PairScreen(autoHost: true),
-                            ),
-                          );
-                          _loadChats();
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                    const SizedBox(height: 40),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildActionButton(
+                          icon: Icons.qr_code_scanner,
+                          label: 'Scan QR',
+                          onTap: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const PairScreen()),
+                            );
+                            _loadChats();
+                          },
+                        ),
+                        _buildActionButton(
+                          icon: Icons.qr_code,
+                          label: 'Show QR',
+                          onTap: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const PairScreen(autoHost: true),
+                              ),
+                            );
+                            _loadChats();
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -520,6 +562,16 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
           _buildProfileTab(),
         ],
       ),
+      floatingActionButton: _currentIndex == 0
+          ? FloatingActionButton(
+              onPressed: _showNewContactDialog,
+              backgroundColor: const Color(0xFF007AFF),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: const Icon(Icons.contact_page, color: Colors.white),
+            )
+          : null,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: const Color(0xFF4A90E2),
