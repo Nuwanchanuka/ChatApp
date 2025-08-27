@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/settings.dart';
 import 'profile_setup_screen.dart';
+import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final bool showBackButton;
@@ -65,26 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                     const Spacer(),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ProfileSetupScreen(),
-                            ),
-                          );
-                        },
-                        icon: const Icon(
-                          Icons.edit,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
+                    // Edit profile button removed as requested
                   ],
                 ),
               ),
@@ -95,7 +77,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
                     children: [
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 20),
+                      // Edit button
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            side: BorderSide(color: Colors.white.withOpacity(0.7)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          onPressed: () async {
+                            final route = MaterialPageRoute(builder: (_) => const EditProfileScreen());
+                            await Navigator.of(context).push(route);
+                            if (mounted) setState(() {}); // refresh values after edit
+                          },
+                          child: const Text('Edit profile'),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
                       
                       // Profile Avatar
                       Container(

@@ -30,6 +30,13 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
   late Chat _currentChat;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  
+  Future<void> _handleBack() async {
+    // Best-effort delete; ignore errors so navigation isn't blocked
+    try {
+      await _chatService.deleteChat(_currentChat.chatId);
+    } catch (_) {}
+  }
 
   @override
   void initState() {
@@ -304,7 +311,12 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
   final titleName = _displayName();
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () async {
+        await _handleBack();
+        return true; // allow pop
+      },
+      child: Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         elevation: 0,
@@ -320,7 +332,10 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () async {
+            await _handleBack();
+            if (mounted) Navigator.pop(context);
+          },
         ),
         title: Row(
           children: [
@@ -362,7 +377,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
         ),
   actions: const [],
       ),
-      body: FadeTransition(
+  body: FadeTransition(
         opacity: _fadeAnimation,
         child: Column(
           children: [
@@ -388,7 +403,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildEmptyState() {
