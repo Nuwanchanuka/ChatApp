@@ -436,12 +436,17 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
   }
 
   Widget _buildMessageInput() {
-    return Container(
+    return SafeArea(
+      top: false,
+      child: Container(
       padding: EdgeInsets.only(
         left: 16,
         right: 16,
         top: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+  // Keep a fixed bottom padding; avoid adding viewInsets here because
+  // the Scaffold already resizes for the keyboard. Adding it causes
+  // the input to jump up toward the middle when typing.
+  bottom: 16,
       ),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -504,6 +509,6 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
           ),
         ],
       ),
-    );
+  ));
   }
 }
