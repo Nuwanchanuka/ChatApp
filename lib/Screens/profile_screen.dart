@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/settings.dart';
 import 'profile_setup_screen.dart';
+import 'edit_profile_sheet.dart';
 
 class ProfileScreen extends StatefulWidget {
   final bool showBackButton;
@@ -16,6 +17,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final settings = SettingsService();
     final name = settings.username ?? 'User';
     final phone = settings.phone ?? '+94XXXXXXXXX';
+    
     final bio = settings.bio ?? 'Hi there! I\'m using ChatApp';
 
     return Container(
@@ -26,7 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           colors: [
             Color(0xFF4A90E2),
             Color(0xFF5BA0F2),
-            Color(0xFF6CB0FF),
+            Color.fromARGB(255, 227, 233, 239),
           ],
         ),
       ),
@@ -84,6 +86,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                     ),
+                      // Header edit icon to open Edit Profile screen
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          onPressed: () async {
+                            final result = await showModalBottomSheet<bool>(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (_) => const EditProfileSheet(),
+                            );
+                            if (mounted && (result ?? false)) {
+                              setState(() {}); // refresh after save
+                            }
+                          },
+                          icon: const Icon(
+                            Icons.edit,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -94,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
                     children: [
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 20),
                       
                       // Profile Avatar
                       Container(
@@ -106,9 +132,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              const Color(0xFFFF6B35),
-                              const Color(0xFFFF8E53),
-                              const Color(0xFFFFA071),
+                              const Color.fromARGB(255, 160, 178, 221),
+                              const Color.fromARGB(255, 160, 178, 221),
+                              const Color.fromARGB(255, 160, 178, 221),
                             ],
                           ),
                           boxShadow: [
@@ -229,8 +255,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ],
                         ),
                       ),
-                      
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 32),
                       
                       // Bio Section
                       Container(
@@ -306,7 +331,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     color: Colors.red,
                                     size: 24,
                                   ),
-                                  const SizedBox(width: 16),
+                                  const SizedBox(width: 10),
                                   const Text(
                                     'Logout',
                                     style: TextStyle(
