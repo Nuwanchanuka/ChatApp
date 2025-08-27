@@ -343,24 +343,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.videocam, color: Colors.white),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Video call feature coming soon!')),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.call, color: Colors.white),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Voice call feature coming soon!')),
-              );
-            },
-          ),
-        ],
+  // No call/phone actions per request
       ),
       body: FadeTransition(
         opacity: _fadeAnimation,
