@@ -16,6 +16,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final settings = SettingsService();
     final name = settings.username ?? 'User';
     final phone = settings.phone ?? '+94XXXXXXXXX';
+    
     final bio = settings.bio ?? 'Hi there! I\'m using ChatApp';
 
     return Container(
@@ -26,7 +27,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           colors: [
             Color(0xFF4A90E2),
             Color(0xFF5BA0F2),
-            Color(0xFF6CB0FF),
+            Color.fromARGB(255, 227, 233, 239),
           ],
         ),
       ),
@@ -106,9 +107,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              const Color(0xFFFF6B35),
-                              const Color(0xFFFF8E53),
-                              const Color(0xFFFFA071),
+                              const Color.fromARGB(255, 160, 178, 221),
+                              const Color.fromARGB(255, 160, 178, 221),
+                              const Color.fromARGB(255, 160, 178, 221),
                             ],
                           ),
                           boxShadow: [
@@ -230,7 +231,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     color: Colors.red,
                                     size: 24,
                                   ),
-                                  const SizedBox(width: 16),
+                                  const SizedBox(width: 10),
                                   const Text(
                                     'Logout',
                                     style: TextStyle(
