@@ -197,7 +197,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha:0.1),
                     blurRadius: 5,
                     offset: const Offset(0, 2),
                   ),
@@ -308,7 +308,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
         title: Row(
           children: [
             CircleAvatar(
-              backgroundColor: Colors.white.withOpacity(0.2),
+              backgroundColor: Colors.white.withValues(alpha:0.2),
               child: Text(
                 _currentChat.name.isNotEmpty ? _currentChat.name[0].toUpperCase() : 'C',
                 style: const TextStyle(
@@ -334,7 +334,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
                   Text(
                     _chatService.isConnected ? 'Online' : 'Offline',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha:0.8),
                       fontSize: 12,
                     ),
                   ),
@@ -451,7 +451,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha:0.1),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),

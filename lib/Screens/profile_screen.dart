@@ -43,7 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     if (widget.showBackButton)
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha:0.2),
                           shape: BoxShape.circle,
                         ),
                         child: IconButton(
@@ -66,7 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const Spacer(),
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha:0.2),
                         shape: BoxShape.circle,
                       ),
                       child: IconButton(
@@ -113,7 +113,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
+                              color: Colors.black.withValues(alpha:0.2),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
                             ),
@@ -149,7 +149,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Text(
                         phone,
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha:0.8),
                           fontSize: 18,
                         ),
                       ),
@@ -161,10 +161,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
+                          color: Colors.white.withValues(alpha:0.15),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha:0.2),
                             width: 1,
                           ),
                         ),
@@ -175,7 +175,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               children: [
                                 Icon(
                                   Icons.info_outline,
-                                  color: Colors.white.withOpacity(0.8),
+                                  color: Colors.white.withValues(alpha:0.8),
                                   size: 24,
                                 ),
                                 const SizedBox(width: 12),
@@ -193,7 +193,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Text(
                               bio,
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
+                                color: Colors.white.withValues(alpha:0.9),
                                 fontSize: 16,
                                 height: 1.4,
                               ),
@@ -208,10 +208,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.15),
+                          color: Colors.red.withValues(alpha:0.15),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: Colors.red.withOpacity(0.4),
+                            color: Colors.red.withValues(alpha:0.4),
                             width: 1.5,
                           ),
                         ),
@@ -288,7 +288,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Text(
                 'Cancel',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha:0.7),
                   fontSize: 16,
                 ),
               ),

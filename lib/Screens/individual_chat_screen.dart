@@ -187,7 +187,7 @@ class _IndividualChatScreenState extends State<IndividualChatScreen> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
+            color: Colors.grey.withValues(alpha:0.3),
             spreadRadius: 1,
             blurRadius: 3,
             offset: const Offset(0, -1),
@@ -364,7 +364,7 @@ class _IndividualChatScreenState extends State<IndividualChatScreen> {
     );
 
     if (confirmed == true) {
-      // This would need to be implemented in the chat service
+      if(!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Clear chat functionality would be implemented here')),
       );

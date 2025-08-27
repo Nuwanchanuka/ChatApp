@@ -31,7 +31,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       hintStyle: const TextStyle(color: Colors.white54),
       prefixIcon: prefixIcon,
       filled: true,
-      fillColor: const Color(0xFF1E3A5F).withOpacity(0.6),
+      fillColor: const Color(0xFF1E3A5F).withValues(alpha:0.6),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
