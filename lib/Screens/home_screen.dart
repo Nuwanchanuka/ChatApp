@@ -167,8 +167,8 @@ class _HomescreenState extends State<Homescreen> {
                   value: 'logout',
                   child: Row(
                     children: [
-                      Icon(Icons.logout, size: 16),
-                      SizedBox(width: 6),
+                      Icon(Icons.logout, size: 18),
+                      SizedBox(width: 8),
                       Text('Logout'),
                     ],
                   ),

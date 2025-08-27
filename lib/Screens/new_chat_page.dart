@@ -28,10 +28,10 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
   bool _loading = true;
   bool _sending = false;
   bool _isTyping = false;
-  bool _chatReady = false;
   late Chat _currentChat;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+
   
   bool get _isEphemeralPeerChat =>
       _chatService.peerId != null && _currentChat.chatId == _chatService.peerId;
@@ -135,20 +135,13 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
     }
   }
 
+
   @override
   void initState() {
     super.initState();
+    _initializeChat();
     _setupAnimations();
-    _initAndLoad();
-  }
-
-  Future<void> _initAndLoad() async {
-    await _initializeChat();
-    if (!mounted) return;
-    setState(() {
-      _chatReady = true;
-    });
-    await _loadMessages();
+    _loadMessages();
     _listenToIncomingMessages();
     _listenToTyping();
   }
@@ -184,13 +177,6 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
         contactId: 'default_${DateTime.now().millisecondsSinceEpoch}',
       );
     }
-  }
-
-  String _displayName() {
-    final fromParam = (widget.contactName ?? '').trim();
-    if (fromParam.isNotEmpty) return fromParam;
-    final name = _chatReady ? _currentChat.name.trim() : '';
-    return name.isNotEmpty ? name : 'Chat';
   }
 
   @override
@@ -317,7 +303,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha:0.1),
                     blurRadius: 5,
                     offset: const Offset(0, 2),
                   ),
@@ -407,10 +393,12 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
+
   final titleName = _displayName();
     return WillPopScope(
   onWillPop: _confirmExitAndMaybeDelete,
       child: Scaffold(
+
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         elevation: 0,
@@ -426,17 +414,19 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
+
           onPressed: () async {
             final ok = await _confirmExitAndMaybeDelete();
             if (ok && mounted) Navigator.pop(context);
           },
+
         ),
         title: Row(
           children: [
             CircleAvatar(
-              backgroundColor: Colors.white.withOpacity(0.2),
+              backgroundColor: Colors.white.withValues(alpha:0.2),
               child: Text(
-        titleName.isNotEmpty ? titleName[0].toUpperCase() : 'C',
+                _currentChat.name.isNotEmpty ? _currentChat.name[0].toUpperCase() : 'C',
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -450,7 +440,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-          titleName,
+                    _currentChat.name,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -460,7 +450,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
                   Text(
                     _chatService.isConnected ? 'Online' : 'Offline',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha:0.8),
                       fontSize: 12,
                     ),
                   ),
@@ -469,9 +459,26 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
             ),
           ],
         ),
-  actions: const [],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.videocam, color: Colors.white),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Video call feature coming soon!')),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.call, color: Colors.white),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Voice call feature coming soon!')),
+              );
+            },
+          ),
+        ],
       ),
-  body: FadeTransition(
+      body: FadeTransition(
         opacity: _fadeAnimation,
         child: Column(
           children: [
@@ -497,7 +504,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
           ],
         ),
       ),
-    ));
+    );
   }
 
   Widget _buildEmptyState() {
@@ -532,7 +539,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
           ),
           const SizedBox(height: 8),
           Text(
-            'Send a message to begin chatting with ${_displayName()}',
+            'Send a message to begin chatting with ${_currentChat.name}',
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[600],
@@ -545,17 +552,12 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
   }
 
   Widget _buildMessageInput() {
-    return SafeArea(
-      top: false,
-      child: Container(
+    return Container(
       padding: EdgeInsets.only(
         left: 16,
         right: 16,
         top: 16,
-  // Keep a fixed bottom padding; avoid adding viewInsets here because
-  // the Scaffold already resizes for the keyboard. Adding it causes
-  // the input to jump up toward the middle when typing.
-  bottom: 16,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 16,
       ),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -565,7 +567,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha:0.1),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -618,6 +620,6 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
           ),
         ],
       ),
-  ));
+    );
   }
 }

@@ -116,7 +116,7 @@ class _PairScreenState extends State<PairScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: const BoxDecoration(
-                    color: Color.fromARGB(255, 58, 116, 183),
+                    color: Colors.deepPurple,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(20),
                       topRight: Radius.circular(20),
@@ -299,7 +299,7 @@ class _PairScreenState extends State<PairScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('QR Code'),
-        backgroundColor: Color.fromARGB(255, 58, 116, 183),
+        backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         centerTitle: true,
       ),
@@ -308,7 +308,7 @@ class _PairScreenState extends State<PairScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color.fromARGB(255, 58, 116, 183), Color.fromARGB(255, 44, 129, 204), Color.fromARGB(255, 255, 255, 255)],
+            colors: [Colors.deepPurple, Colors.purple, Colors.purpleAccent],
           ),
         ),
         child: SafeArea(

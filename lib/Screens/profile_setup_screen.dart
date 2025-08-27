@@ -31,7 +31,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       hintStyle: const TextStyle(color: Colors.white54),
       prefixIcon: prefixIcon,
       filled: true,
-      fillColor: const Color(0xFF1E3A5F).withOpacity(0.6),
+      fillColor: const Color(0xFF1E3A5F).withValues(alpha:0.6),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -89,7 +89,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
         ),
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 100),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
             child: Form(
               key: _formKey,
               child: Column(
@@ -240,7 +240,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                       child: _saving
                           ? const SizedBox(
                               width: 24,
-                              // height: 24,
+                              height: 24,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
                                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),

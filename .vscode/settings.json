@@ -4,5 +4,6 @@
   // Show Run in status bar for quick start
   "code-runner.runInTerminal": true,
   // Keep terminal visible
-  "terminal.integrated.defaultProfile.windows": "PowerShell"
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "java.configuration.updateBuildConfiguration": "interactive"
 }
