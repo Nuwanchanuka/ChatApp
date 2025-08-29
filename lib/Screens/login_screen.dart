@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('Enter a username to start chatting', style: TextStyle(fontSize: 16)),
+                  const Text('', style: TextStyle(fontSize: 16)),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _nameController,

@@ -100,7 +100,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         labelStyle: const TextStyle(color: Colors.black54),
         prefixIcon: prefixIcon,
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: const Color.fromARGB(255, 254, 245, 112),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
@@ -118,9 +118,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color.fromARGB(255, 213, 235, 94),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 208, 233, 119),
         foregroundColor: Colors.black87,
         elevation: 0,
         leading: IconButton(
@@ -138,7 +138,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               // Shadow box section containing the form fields
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: const Color.fromARGB(255, 207, 221, 160),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
@@ -174,7 +174,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
                                 value: _countryLabel,
-                                dropdownColor: Colors.white,
+                                dropdownColor: const Color.fromARGB(255, 226, 230, 113),
                                 items: _countries
                                     .map((c) => DropdownMenuItem<String>(
                                           value: c['label']!,

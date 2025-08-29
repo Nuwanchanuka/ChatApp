@@ -120,9 +120,9 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Color(0xFF4A90E2),
-            Color(0xFF5BA0F2),
-             Color.fromARGB(255, 227, 233, 239),
+             Color.fromARGB(255, 151, 121, 52),
+            Color.fromARGB(255, 151, 121, 52),
+             Color.fromARGB(255, 151, 121, 52),
           ],
         ),
       ),
@@ -143,17 +143,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
                     ),
                   ),
                   const Spacer(),
-                  IconButton(
-                    onPressed: () {
-                      // Refresh chats
-                      _loadChats();
-                    },
-                    icon: const Icon(
-                      Icons.refresh,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
+                  
                 ],
               ),
             ),
@@ -195,7 +185,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
         ),
         const SizedBox(height: 24),
         const Text(
-          'No chats yet',
+          '',
           style: TextStyle(
             color: Colors.white,
             fontSize: 20,
@@ -214,7 +204,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
         const SizedBox(height: 32),
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF007AFF),
+            color: const Color.fromARGB(255, 24, 181, 63),
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
@@ -298,7 +288,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
                       child: Text(
                         chat.name.isNotEmpty ? chat.name[0].toUpperCase() : '?',
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: Color.fromARGB(255, 80, 44, 44),
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                         ),
@@ -382,9 +372,9 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Color(0xFF6CB0FF),
-            Color(0xFF6CB0FF),
-            Color.fromARGB(255, 227, 233, 239),
+            Color.fromARGB(255, 151, 121, 52),
+             Color.fromARGB(255, 151, 121, 52),
+            Color.fromARGB(255, 151, 121, 52),
           ],
         ),
       ),
@@ -493,7 +483,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF007AFF),
+        color:  const Color.fromARGB(255, 24, 181, 63),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -565,7 +555,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
       floatingActionButton: _currentIndex == 0
           ? FloatingActionButton(
               onPressed: _showNewContactDialog,
-              backgroundColor: const Color(0xFF007AFF),
+              backgroundColor: const Color.fromARGB(255, 24, 181, 63),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18),
               ),
@@ -574,7 +564,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
           : null,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF4A90E2),
+          color: const Color.fromARGB(255, 50, 88, 133),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),

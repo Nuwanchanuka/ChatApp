@@ -6,6 +6,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../services/settings.dart';
 import '../services/chat_service.dart';
 import 'new_chat_page.dart';
+import 'new_contact_page.dart';
 
 class PairScreen extends StatefulWidget {
   final bool autoHost;
@@ -116,7 +117,7 @@ class _PairScreenState extends State<PairScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: const BoxDecoration(
-                    color: Color.fromARGB(255, 58, 116, 183),
+                    color: Color.fromARGB(255, 32, 66, 105),
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(20),
                       topRight: Radius.circular(20),
@@ -156,15 +157,59 @@ class _PairScreenState extends State<PairScreen> {
                           final List<Barcode> barcodes = capture.barcodes;
                           for (final barcode in barcodes) {
                             final String? code = barcode.rawValue?.trim();
-                            
-                            if (code != null && (code.startsWith('ws://') || code.startsWith('wss://'))) {
-                              print('📷 QR Code detected: $code'); // Debug log
+
+                            if (code == null) continue;
+
+                            // WebSocket pairing URL -> connect flow
+                            if (code.startsWith('ws://') || code.startsWith('wss://')) {
+                              print('📷 QR Code detected (ws): $code');
                               _handled = true;
                               _scannerController.stop();
                               Navigator.of(context).pop(); // Close scanner dialog
                               _joinConnection(code);
                               // Also start waiting for chat creation
                               _waitForChatCreation();
+                              break;
+                            }
+
+                            // Contact QR - expected formats:
+                            // 1) Plain id (e.g., "contact:peerId:name:email")
+                            // 2) JSON with {"id":"..","name":"..","email":".."}
+                            // 3) plain peerId string
+                            // (Optionally) JSON parsing could be added here if QR payload is JSON.
+
+                            // Simple contact format: contact:id:name:email
+                            if (code.startsWith('contact:')) {
+                              final parts = code.split(':');
+                              final id = parts.length > 1 ? parts[1] : '';
+                              final name = parts.length > 2 ? parts[2] : '';
+                              final email = parts.length > 3 ? parts[3] : null;
+                              print('📷 Contact QR detected: id=$id name=$name');
+                              _handled = true;
+                              _scannerController.stop();
+                              Navigator.of(context).pop();
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => NewContactPage(id: id, name: Uri.decodeComponent(name), email: email != null ? Uri.decodeComponent(email) : null),
+                                ),
+                              );
+                              break;
+                            }
+
+                            // Fallback: treat code as peer id
+                            if (code.isNotEmpty) {
+                              final id = code;
+                              print('📷 Fallback contact QR detected: id=$id');
+                              _handled = true;
+                              _scannerController.stop();
+                              Navigator.of(context).pop();
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => NewContactPage(id: id, name: '', email: null),
+                                ),
+                              );
                               break;
                             }
                           }
@@ -299,7 +344,7 @@ class _PairScreenState extends State<PairScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('QR Code'),
-        backgroundColor: Color.fromARGB(255, 58, 116, 183),
+        backgroundColor:  Color.fromARGB(255, 151, 121, 52),
         foregroundColor: Colors.white,
         centerTitle: true,
       ),
@@ -308,7 +353,7 @@ class _PairScreenState extends State<PairScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color.fromARGB(255, 58, 116, 183), Color.fromARGB(255, 44, 129, 204), Color.fromARGB(255, 255, 255, 255)],
+            colors: [  Color.fromARGB(255, 151, 121, 52),  Color.fromARGB(255, 151, 121, 52), Color.fromARGB(255, 255, 255, 255)],
           ),
         ),
         child: SafeArea(
@@ -342,7 +387,7 @@ class _PairScreenState extends State<PairScreen> {
                         onPressed: _host,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
-                          foregroundColor: Colors.deepPurple,
+                          foregroundColor: const Color.fromARGB(255, 62, 183, 58),
                           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -471,7 +516,7 @@ class _PairScreenState extends State<PairScreen> {
                           foregroundColor: Colors.black,
                           eyeStyle: const QrEyeStyle(
                             eyeShape: QrEyeShape.circle,
-                            color: Color(0xFF4F67FF),
+                            color:   Color.fromARGB(255, 151, 121, 52),
                           ),
                           dataModuleStyle: const QrDataModuleStyle(
                             dataModuleShape: QrDataModuleShape.circle,

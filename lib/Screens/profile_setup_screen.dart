@@ -35,7 +35,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF2F4A6B)),
+        borderSide: const BorderSide(color: Color.fromARGB(255, 33, 61, 95)),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -43,7 +43,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF4A90E2), width: 2),
+        borderSide: const BorderSide(color: Color.fromARGB(255, 39, 65, 96), width: 2),
       ),
     );
   }
@@ -81,9 +81,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF1E3A5F),
-              Color(0xFF2A4A73),
-              Color(0xFF1A2B42),
+              Color.fromARGB(255, 151, 121, 52),
+            Color.fromARGB(255, 151, 121, 52),
+             Color.fromARGB(255, 151, 121, 52),
             ],
           ),
         ),
@@ -100,7 +100,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   // Welcome Text
                   const Center(
                     child: Text(
-                      'Welcome!',
+                      'Welcome',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 32,
@@ -112,7 +112,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   
                   // Subtitle
                   const Text(
-                    'Set up your profile',
+                    'Create Your Profile',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -123,7 +123,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   
                   // Description
                   const Text(
-                    'Enter your details to get started with ChatLink',
+                    '',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 16,
@@ -153,7 +153,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFF6B35),
+                            color: const Color.fromARGB(255, 222, 112, 72),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: const Text(
@@ -220,7 +220,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                     controller: _bioController,
                     maxLines: 3,
                     style: const TextStyle(color: Colors.white),
-                    decoration: _buildInputDecoration('Tell us about yourself...'),
+                    decoration: _buildInputDecoration('Tell us about yourself'),
                   ),
                   const SizedBox(height: 40),
 
@@ -231,7 +231,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                     child: ElevatedButton(
                       onPressed: _saving ? null : _onContinue,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF007AFF),
+                        backgroundColor: const Color.fromARGB(255, 16, 54, 95),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),

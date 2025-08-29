@@ -26,9 +26,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Color(0xFF4A90E2),
-            Color(0xFF5BA0F2),
-            Color.fromARGB(255, 227, 233, 239),
+             Color.fromARGB(255, 151, 121, 52),
+             Color.fromARGB(255, 151, 121, 52),
+            Color.fromARGB(255, 151, 121, 52),
           ],
         ),
       ),
@@ -112,9 +112,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              const Color.fromARGB(255, 160, 178, 221),
-                              const Color.fromARGB(255, 160, 178, 221),
-                              const Color.fromARGB(255, 160, 178, 221),
+                              const Color.fromARGB(255, 125, 142, 195),
+                            const Color.fromARGB(255, 125, 142, 195),
+                              const Color.fromARGB(255, 125, 142, 195),
                             ],
                           ),
                           boxShadow: [
@@ -222,7 +222,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
+                          color: const Color.fromARGB(255, 106, 74, 74).withOpacity(0.15),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: Colors.white.withOpacity(0.2),
@@ -254,7 +254,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Text(
                               bio,
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
+                                color: const Color.fromARGB(255, 54, 49, 49).withOpacity(0.9),
                                 fontSize: 16,
                                 height: 1.4,
                               ),
@@ -269,11 +269,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(20),
+                          color: const Color.fromARGB(255, 92, 53, 247).withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(50),
                           border: Border.all(
-                            color: Colors.red.withOpacity(0.4),
-                            width: 1.5,
+                            color: const Color.fromARGB(255, 255, 250, 250).withOpacity(0.4),
+                            width: 1,
                           ),
                         ),
                         child: Material(

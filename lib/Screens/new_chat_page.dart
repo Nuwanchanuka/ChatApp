@@ -303,12 +303,12 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
               decoration: BoxDecoration(
                 gradient: isMe 
                   ? const LinearGradient(
-                      colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                      colors: [Color.fromARGB(255, 236, 209, 89), Color.fromARGB(255, 164, 159, 63)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     )
                   : null,
-                color: isMe ? null : Colors.grey[200],
+                color: isMe ? null : const Color.fromARGB(255, 149, 225, 102),
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(20),
                   topRight: const Radius.circular(20),
@@ -411,14 +411,14 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
     return WillPopScope(
   onWillPop: _confirmExitAndMaybeDelete,
       child: Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: const Color.fromARGB(255, 67, 84, 126),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+              colors: [Color.fromARGB(255, 67, 39, 177), Color.fromARGB(255, 64, 64, 231)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -479,7 +479,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
               child: _loading
                   ? const Center(
                       child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF667eea)),
+                        valueColor: AlwaysStoppedAnimation<Color>(Color.fromARGB(255, 57, 90, 234)),
                       ),
                     )
                   : _messages.isEmpty
@@ -509,7 +509,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                colors: [Color(0xFF667eea), Color.fromARGB(255, 65, 39, 216)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -558,7 +558,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
   bottom: 16,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color.fromARGB(255, 193, 168, 168),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
@@ -596,7 +596,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                colors: [Color(0xFF667eea), Color.fromARGB(255, 56, 29, 228)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -609,7 +609,7 @@ class _NewChatPageState extends State<NewChatPage> with TickerProviderStateMixin
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        valueColor: AlwaysStoppedAnimation<Color>(Color.fromARGB(255, 158, 51, 51)),
                       ),
                     )
                   : const Icon(Icons.send, color: Colors.white),
